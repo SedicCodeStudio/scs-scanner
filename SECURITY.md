@@ -33,7 +33,20 @@ gh attestation verify scs.pyz --repo SedicCodeStudio/scs-scanner
 Get-FileHash .\scs.ps1 -Algorithm SHA256   # compare with SHA256SUMS
 ```
 
-The release build is reproducible: `python3 tools/build_release.py` on the tagged source produces byte-identical files.
+**Check that a release contains exactly the published source code** – put the downloaded files into one folder and run:
+
+```sh
+git clone https://github.com/SedicCodeStudio/scs-scanner && cd scs-scanner
+git worktree add ../scs-v0.2.0 v0.2.0                        # the source of the version you downloaded
+python3 tools/verify_release.py ~/Downloads/scs --source ../scs-v0.2.0
+```
+
+The tool rebuilds the release from that source and compares every file inside `scs.pyz` and the ZIP, `scs.ps1` byte
+for byte, the SBOM and `SHA256SUMS`. The build is reproducible (fixed timestamps, order and permissions); `scs.ps1` is
+always byte-identical, and the archives are too when they are compressed by the same zlib version as on the GitHub
+runner – which is why the tool compares the files inside them rather than the compressed bytes.
+The Windows installer cannot be rebuilt byte for byte; its checksum and the build provenance attestation cover it.
+
 Each release also contains a software bill of materials (`sbom.cdx.json`, CycloneDX 1.5) that lists every part of the
 release and where third-party components come from.
 

@@ -19,6 +19,11 @@ The workflow `.github/workflows/release.yml` then builds everything reproducibly
 | `sbom.cdx.json` | software bill of materials (CycloneDX) |
 | `SHA256SUMS`, `ONE-LINERS.md` | checksums and copy-and-paste commands for this version |
 
+4. Check the published release: download its files into one folder and run
+   `python3 tools/verify_release.py FOLDER` (on the tagged commit). It confirms that the downloads contain exactly the
+   source code and that `SHA256SUMS` and the SBOM match. CI already builds, installs and uninstalls the Windows
+   installer on every push, so a release does not hold surprises there.
+
 ## Code signing (recommended)
 
 Unsigned Windows programs trigger SmartScreen warnings ("Windows protected your PC"), and some antivirus programs are

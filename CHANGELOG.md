@@ -2,6 +2,13 @@
 
 All notable changes to the SCS Scanner. Versions follow [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+- `tools/verify_release.py`: checks downloaded release files against the source code (files inside the archives,
+  `scs.ps1`, SBOM, `SHA256SUMS`) – independent of the zlib version that compressed the archives.
+- CI builds the Windows installer on every push, installs it silently, checks the installed files and version
+  information and uninstalls it again. The build script finds Inno Setup 6 and 7.
+
 ## 0.2.0 – 2026-10-29
 
 ### New

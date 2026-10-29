@@ -139,7 +139,8 @@ are not affected.
 - HTTPS-only downloads with size limits; the data folder `~/.scs-scanner` is private; no shell command lines are built
   from device or file input; reports escape all content.
 - Reproducible release builds with SHA-256 checksums, a software bill of materials (`sbom.cdx.json`, CycloneDX) and
-  GitHub build provenance attestations – see [SECURITY.md](SECURITY.md). CodeQL and OpenSSF Scorecard check the code
+  GitHub build provenance attestations; `tools/verify_release.py` checks that downloaded release files contain exactly
+  the published source code – see [SECURITY.md](SECURITY.md). CodeQL and OpenSSF Scorecard check the code
   and the supply chain; all workflow actions are pinned to commit hashes.
 
 ## 9. Limits – honestly
