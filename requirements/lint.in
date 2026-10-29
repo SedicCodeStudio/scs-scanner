@@ -1,2 +1,2 @@
 # Lint tool for CI. Lock file: lint.txt
-ruff==0.16.9
+ruff==0.17.2
