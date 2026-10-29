@@ -4,7 +4,8 @@
 
 1. Update `VERSION` in `scs/core.py` and the list in `CHANGELOG.md`.
 2. Run the tests: `python3 -m pytest`.
-3. Commit, then tag and push: `git tag -a v0.2.1 -m "SCS Scanner 0.2.1" && git push origin main v0.2.1`.
+3. Commit and push to `main`, then either push a tag (`git tag -a v0.2.1 -m "SCS Scanner 0.2.1" && git push origin v0.2.1`)
+   or open *Actions › Release › Run workflow* – the workflow then creates the tag `v<VERSION>` itself.
 
 The workflow `.github/workflows/release.yml` then builds everything reproducibly, signs a build provenance attestation
 (Sigstore, no secret needed) and publishes the GitHub release with:

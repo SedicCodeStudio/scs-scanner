@@ -3,6 +3,7 @@ name: Release
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:   # "Run workflow" in the Actions tab: releases the version in scs/core.py and creates its tag
 
 permissions:
   contents: read
@@ -10,6 +11,8 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
     permissions:
       contents: write        # create the GitHub release
       id-token: write        # sign the build provenance
@@ -21,10 +24,12 @@ jobs:
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.13"
-      - name: Check that the tag matches the version
+      - name: Version and tag
+        id: version
         run: |
           v=$(python -c "import re;print(re.search(r'VERSION = \"(.+?)\"', open('scs/core.py').read()).group(1))")
-          test "v$v" = "$GITHUB_REF_NAME"
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then test "v$v" = "$GITHUB_REF_NAME"; fi
+          echo "tag=v$v" >> "$GITHUB_OUTPUT"
       - run: python -m pip install pytest==8.3.5 && python -m pytest -q
       - name: Build (reproducible)
         run: SOURCE_DATE_EPOCH=$(git log -1 --format=%ct) python tools/build_release.py --out dist
@@ -37,9 +42,11 @@ jobs:
       - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ steps.version.outputs.tag }}
         run: |
-          gh release create "$GITHUB_REF_NAME" dist/scs.pyz dist/scs.ps1 dist/SCS-Scanner-*.zip dist/sbom.cdx.json dist/SHA256SUMS dist/ONE-LINERS.md \
-            --title "SCS Scanner ${GITHUB_REF_NAME#v}" --notes-file dist/ONE-LINERS.md --verify-tag
+          gh release create "$TAG" dist/scs.pyz dist/scs.ps1 dist/SCS-Scanner-*.zip dist/sbom.cdx.json dist/SHA256SUMS dist/ONE-LINERS.md \
+            --title "SCS Scanner ${TAG#v}" --notes-file dist/ONE-LINERS.md --target "$GITHUB_SHA"
 
   windows-installer:
     needs: release
@@ -79,9 +86,11 @@ jobs:
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.release.outputs.tag }}
         run: |
           $setup = Get-ChildItem dist/SCS-Scanner-Setup-*.exe | Select-Object -First 1
-          gh release download $env:GITHUB_REF_NAME --pattern SHA256SUMS --dir dist --clobber
+          gh release download $env:TAG --pattern SHA256SUMS --dir dist --clobber
           $hash = (Get-FileHash $setup.FullName -Algorithm SHA256).Hash.ToLower()
           [IO.File]::AppendAllText((Resolve-Path dist/SHA256SUMS), "$hash  $($setup.Name)`n")
-          gh release upload $env:GITHUB_REF_NAME $setup.FullName dist/SHA256SUMS --clobber
+          gh release upload $env:TAG $setup.FullName dist/SHA256SUMS --clobber
