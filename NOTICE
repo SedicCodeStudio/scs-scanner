@@ -1,0 +1,21 @@
+SCS Scanner
+Copyright 2026 Sedic Code Studio
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Third-party data
+----------------
+This repository does not contain third-party indicator lists or detection rules. They are downloaded by the
+user's own computer, straight from their public sources, when an update is run, and they remain subject to the
+terms of their authors:
+
+- Mobile Verification Toolkit indicator index - https://github.com/mvt-project/mvt-indicators
+  and the indicator files it lists, published by Amnesty International Security Lab, Citizen Lab and other
+  research organisations (for example https://github.com/AmnestyTech/investigations).
+- Stalkerware indicators by Echap - https://github.com/AssoEchap/stalkerware-indicators
+- Zero Breach indicators - https://github.com/interplains/zero-breach
+- signature-base YARA rules by Florian Roth / Nextron Systems (only with "scs update --yara"),
+  Detection Rule License (DRL) 1.1 - https://github.com/Neo23x0/signature-base
+
+No source code of these projects is included. The detection approach follows the public documentation of
+MVT and androidqf (Amnesty International Security Lab), TinyCheck and Zero Breach.

@@ -1,0 +1,5 @@
+# Optional extras - the scanner runs without them. Install with: python -m pip install -r optional-packages.txt
+# YARA rule scanning in the full scan (then run "scs update --yara" once):
+yara-python
+# Encrypted iPhone backups:
+iphone_backup_decrypt

@@ -1,0 +1,18 @@
+name: False positive
+description: A finding that is wrong (a harmless program or file was reported)
+labels: [false positive]
+body:
+  - type: markdown
+    attributes:
+      value: "Do not upload the file itself or private data. The name of the program, its publisher and the SHA-256 fingerprint are enough."
+  - type: input
+    id: finding
+    attributes: { label: Finding, description: Status and title as shown, placeholder: "WARNING – Suspicious autostart: ..." }
+    validations: { required: true }
+  - type: input
+    id: program
+    attributes: { label: Program or file, description: "Name, publisher, where it came from, SHA-256 if available" }
+    validations: { required: true }
+  - type: input
+    id: version
+    attributes: { label: Version of SCS Scanner, placeholder: "0.2.0" }

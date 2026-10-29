@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scs-scanner"
+dynamic = ["version"]
+description = "Checks your own computers and phones for spyware, stalkerware, malware, hidden files and redirected traffic."
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{ name = "Sedic Code Studio", email = "info@sediccodestudio.de" }]
+requires-python = ">=3.8"
+keywords = ["security", "spyware", "stalkerware", "pegasus", "malware", "forensics", "ioc", "privacy"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Environment :: X11 Applications :: Tk",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Topic :: Security",
+]
+
+[project.optional-dependencies]
+yara = ["yara-python>=4.3"]
+ios = ["iphone_backup_decrypt>=0.9"]
+
+[project.scripts]
+scs = "scs.cli:main"
+
+[project.gui-scripts]
+scs-gui = "scs.gui:main"
+
+[project.urls]
+Homepage = "https://github.com/SedicCodeStudio/scs-scanner"
+Issues = "https://github.com/SedicCodeStudio/scs-scanner/issues"
+Changelog = "https://github.com/SedicCodeStudio/scs-scanner/blob/main/CHANGELOG.md"
+Security = "https://github.com/SedicCodeStudio/scs-scanner/blob/main/SECURITY.md"
+
+[tool.setuptools]
+packages = ["scs"]
+
+[tool.setuptools.dynamic]
+version = { attr = "scs.core.VERSION" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 140
+target-version = "py38"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "S"]
+# S108: the scanner inspects temp folders, it does not create files there; S310: downloads are restricted to HTTPS in code
+# S608: SQL only uses fixed table names; S606: opening reports with the system viewer
+ignore = ["S603", "S607", "S110", "S112", "B904", "E501", "S324", "S108", "S310", "S608", "S606"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "S108"]
+"tools/*" = ["S103"]

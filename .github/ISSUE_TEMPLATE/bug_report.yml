@@ -1,0 +1,28 @@
+name: Bug report
+description: The program does not work as expected
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "Never post reports, screenshots or files that show private data. The diagnostic log (`~/.scs-scanner/logs/scs.log`) contains no scan results and helps a lot."
+  - type: input
+    id: version
+    attributes: { label: Version, description: "Shown in the title bar, or: scs --version", placeholder: "0.2.0" }
+    validations: { required: true }
+  - type: dropdown
+    id: edition
+    attributes:
+      label: Edition
+      options: [Desktop app (window), Terminal (Python), PowerShell edition, Windows installer]
+    validations: { required: true }
+  - type: input
+    id: system
+    attributes: { label: System, placeholder: "Windows 11 23H2 / macOS 15 / Ubuntu 24.04 / Android 15 / browser" }
+    validations: { required: true }
+  - type: textarea
+    id: what
+    attributes: { label: What happened, description: Steps to reproduce, what you expected, what happened instead. }
+    validations: { required: true }
+  - type: textarea
+    id: log
+    attributes: { label: Diagnostic log, description: The relevant part of scs.log (optional), render: text }

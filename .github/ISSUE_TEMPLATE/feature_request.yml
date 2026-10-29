@@ -1,0 +1,8 @@
+name: Idea or new check
+description: Suggest an improvement or a new check
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes: { label: What should the scanner do?, description: Which threat or problem would it detect, and how? Links to public research help. }
+    validations: { required: true }

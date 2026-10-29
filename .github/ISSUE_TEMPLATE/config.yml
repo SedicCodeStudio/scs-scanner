@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability privately
+    url: https://github.com/SedicCodeStudio/scs-scanner/security/advisories/new
+    about: Please do not report security problems in public issues.
+  - name: I think I am being spied on
+    url: https://github.com/SedicCodeStudio/scs-scanner/blob/main/docs/WHAT-TO-DO.md
+    about: Steps to take, and organisations that help for free.
