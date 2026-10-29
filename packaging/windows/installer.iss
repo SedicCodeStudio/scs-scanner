@@ -1,4 +1,4 @@
-; Installer of SCS Scanner (Inno Setup 6). Built by packaging\windows\build.ps1.
+; Installer of SCS Scanner (Inno Setup 6 or 7). Built by packaging\windows\build.ps1.
 #ifndef AppVersion
   #define AppVersion "0.0.0"
 #endif

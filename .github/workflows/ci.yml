@@ -55,6 +55,43 @@ jobs:
           if ($LASTEXITCODE -gt 1) { exit 1 }
           Get-Content scan.json -Raw | ConvertFrom-Json | Out-Null
 
+  windows-installer:
+    name: Windows installer (build, install, uninstall)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.13"
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+      - name: Build the program and the installer
+        shell: pwsh
+        run: ./packaging/windows/build.ps1
+      - name: Silent install, check the installed files, silent uninstall
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $version = (Select-String -Path scs/core.py -Pattern '^VERSION = "(.+)"').Matches[0].Groups[1].Value
+          $setup = Get-Item "dist/SCS-Scanner-Setup-$version.exe"
+          $dir = Join-Path $env:RUNNER_TEMP 'SCS Scanner'
+          $p = Start-Process $setup.FullName -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/DIR=`"$dir`"" -Wait -PassThru
+          if ($p.ExitCode) { throw "setup ended with exit code $($p.ExitCode)" }
+          foreach ($f in 'SCS Scanner.exe', 'powershell\scs.ps1', 'LICENSE', 'NOTICE.txt', 'README.md', 'WHAT-TO-DO.md') {
+            if (-not (Test-Path -LiteralPath (Join-Path $dir $f))) { throw "missing after install: $f" }
+          }
+          $exe = Get-Item -LiteralPath (Join-Path $dir 'SCS Scanner.exe')
+          if ($exe.VersionInfo.ProductVersion -ne $version) { throw "wrong version resource: $($exe.VersionInfo.ProductVersion)" }
+          $out = powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $dir 'powershell\scs.ps1') -Version
+          if ("$out" -notmatch [regex]::Escape($version)) { throw "installed PowerShell edition reports: $out" }
+          $p = Start-Process (Join-Path $dir 'unins000.exe') -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART' -Wait -PassThru
+          if ($p.ExitCode) { throw "uninstall ended with exit code $($p.ExitCode)" }
+          for ($i = 0; $i -lt 60 -and (Test-Path -LiteralPath $exe.FullName); $i++) { Start-Sleep -Seconds 1 }
+          if (Test-Path -LiteralPath $exe.FullName) { throw 'the program is still there after uninstalling' }
+          Write-Host "Installer $($setup.Name) ($([math]::Round($setup.Length / 1MB, 1)) MB): install and uninstall work."
+
   lint:
     runs-on: ubuntu-latest
     steps:
