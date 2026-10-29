@@ -11,7 +11,7 @@ if (-not $Version) { $Version = (Select-String -Path (Join-Path $root 'scs\core.
 $build = Join-Path $root 'build'
 New-Item -ItemType Directory -Force -Path $build | Out-Null
 
-python -m pip install --disable-pip-version-check pyinstaller==6.22.3
+python -m pip install --disable-pip-version-check --require-hashes -r (Join-Path $PSScriptRoot 'requirements.txt')
 if ($LASTEXITCODE) { throw 'pip failed' }
 python (Join-Path $PSScriptRoot 'make_version_file.py') $Version (Join-Path $build 'version_info.txt')
 python -m PyInstaller --noconfirm --clean --windowed --name 'SCS Scanner' `

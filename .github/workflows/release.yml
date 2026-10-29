@@ -30,7 +30,7 @@ jobs:
           v=$(python -c "import re;print(re.search(r'VERSION = \"(.+?)\"', open('scs/core.py').read()).group(1))")
           if [ "$GITHUB_REF_TYPE" = "tag" ]; then test "v$v" = "$GITHUB_REF_NAME"; fi
           echo "tag=v$v" >> "$GITHUB_OUTPUT"
-      - run: python -m pip install pytest==8.3.5 && python -m pytest -q
+      - run: python -m pip install --require-hashes -r requirements/test.txt && python -m pytest -q
       - name: Build (reproducible)
         run: SOURCE_DATE_EPOCH=$(git log -1 --format=%ct) python tools/build_release.py --out dist
       - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2

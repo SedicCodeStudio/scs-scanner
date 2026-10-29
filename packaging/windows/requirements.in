@@ -1,0 +1,2 @@
+# Build tool for the Windows program (packaging/windows/build.ps1). Lock file: requirements.txt
+pyinstaller==6.22.3

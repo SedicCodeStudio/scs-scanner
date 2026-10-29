@@ -4,3 +4,14 @@ updates:
     directory: /
     schedule:
       interval: monthly
+
+  # hash-pinned tools: requirements/*.txt (tests, lint) and the Windows build (PyInstaller)
+  - package-ecosystem: pip
+    directories:
+      - /
+      - /packaging/windows
+    schedule:
+      interval: monthly
+    groups:
+      python-tools:
+        patterns: ["*"]

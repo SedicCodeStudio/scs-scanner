@@ -19,6 +19,7 @@ import hashlib
 import json
 import os
 import re
+import stat
 import sys
 import time
 import uuid
@@ -86,7 +87,7 @@ def build_pyz(path):
     os.remove(tmp)
     with open(path, "wb") as fh:
         fh.write(b"#!/usr/bin/env python3\n" + body)
-    os.chmod(path, 0o755)
+    os.chmod(path, os.stat(path).st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)  # like chmod +x
 
 
 def build_zip(path, ver):

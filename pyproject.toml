@@ -10,7 +10,7 @@ readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]
 authors = [{ name = "Sedic Code Studio", email = "info@sediccodestudio.de" }]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 keywords = ["security", "spyware", "stalkerware", "pegasus", "malware", "forensics", "ioc", "privacy"]
 classifiers = [
     "Development Status :: 4 - Beta",

@@ -16,7 +16,7 @@ Thank you for helping. Bug reports, new checks and translations are welcome.
 ## Development
 
 ```sh
-python3 -m pip install pytest ruff
+python3 -m pip install --require-hashes -r requirements/test.txt -r requirements/lint.txt
 python3 -m pytest              # also runs the PowerShell tests when pwsh is installed
 ruff check scs tools tests
 python3 tools/build_release.py # builds dist/ reproducibly

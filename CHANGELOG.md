@@ -11,6 +11,9 @@ All notable changes to the SCS Scanner. Versions follow [Semantic Versioning](ht
   program, its window opens, the installed PowerShell edition runs, silent uninstall.
 - `"SCS Scanner.exe" --check REPORT.txt` runs the self-test of the installed Windows program without a window
   (for support). The build script finds Inno Setup 6 and 7.
+- Supply chain: CI, the release workflow and the Windows build install their tools (pytest, ruff, PyInstaller) only
+  from hash-pinned lock files (`requirements/`, `packaging/windows/requirements.txt`), kept current by Dependabot.
+- The minimum Python version is now 3.9 – the oldest version the tests run on (Python 3.8 is end-of-life).
 
 ## 0.2.0 – 2026-10-29
 

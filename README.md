@@ -154,7 +154,7 @@ are not affected.
 ## 10. Development and project
 
 ```sh
-python3 -m pip install pytest ruff
+python3 -m pip install --require-hashes -r requirements/test.txt -r requirements/lint.txt
 python3 -m pytest                     # includes the PowerShell tests when pwsh is installed
 python3 tools/build_release.py        # reproducible release files in dist/
 ```

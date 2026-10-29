@@ -172,7 +172,9 @@ def apk_cert_hashes(path):
             cert = None
     if not cert:
         return None, None
-    return hashlib.sha1(cert).hexdigest(), hashlib.sha256(cert).hexdigest()
+    # The signing certificate is public. SHA-1 only serves to compare it with indicator lists that publish
+    # certificate SHA-1 fingerprints (stalkerware indicators) - it protects nothing.
+    return hashlib.sha1(cert, usedforsecurity=False).hexdigest(), hashlib.sha256(cert).hexdigest()
 
 
 # --------------------------------------------------------------- check
