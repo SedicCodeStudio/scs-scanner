@@ -21,8 +21,8 @@ The workflow `.github/workflows/release.yml` then builds everything reproducibly
 
 4. Check the published release: download its files into one folder and run
    `python3 tools/verify_release.py FOLDER` (on the tagged commit). It confirms that the downloads contain exactly the
-   source code and that `SHA256SUMS` and the SBOM match. CI already builds, installs and uninstalls the Windows
-   installer on every push, so a release does not hold surprises there.
+   source code and that `SHA256SUMS` and the SBOM match. The Windows installer is tested before it is published
+   (`packaging/windows/test-installer.ps1`: install, self-test, window, uninstall) – CI runs the same test on every push.
 
 ## Code signing (recommended)
 
