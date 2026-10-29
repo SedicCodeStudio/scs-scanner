@@ -18,6 +18,7 @@ The workflow `.github/workflows/release.yml` then builds everything reproducibly
 | `SCS-Scanner-Setup-<version>.exe` | Windows installer (PyInstaller + Inno Setup) |
 | `sbom.cdx.json` | software bill of materials (CycloneDX) |
 | `SHA256SUMS`, `ONE-LINERS.md` | checksums and copy-and-paste commands for this version |
+| `*-provenance.sigstore.json` | signed build provenance of the program files and of the installer (Sigstore bundles) |
 
 4. Check the published release: download its files into one folder and run
    `python3 tools/verify_release.py FOLDER` (on the tagged commit). It confirms that the downloads contain exactly the

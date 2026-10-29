@@ -14,6 +14,8 @@ All notable changes to the SCS Scanner. Versions follow [Semantic Versioning](ht
 - Supply chain: CI, the release workflow and the Windows build install their tools (pytest, ruff, PyInstaller) only
   from hash-pinned lock files (`requirements/`, `packaging/windows/requirements.txt`), kept current by Dependabot.
 - The minimum Python version is now 3.9 – the oldest version the tests run on (Python 3.8 is end-of-life).
+- Releases also contain the signed build provenance as files (`*-provenance.sigstore.json`) for checks without the
+  GitHub API.
 
 ## 0.2.0 – 2026-10-29
 

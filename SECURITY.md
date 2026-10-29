@@ -25,9 +25,13 @@ Every release lists the SHA-256 checksums of its files (`SHA256SUMS`), and the r
 provenance attestation created by GitHub Actions. To check a file:
 
 ```sh
-shasum -a 256 -c SHA256SUMS            # Linux / macOS
+shasum -a 256 -c SHA256SUMS            # Linux / macOS (lists a missing file for each one you did not download)
 gh attestation verify scs.pyz --repo SedicCodeStudio/scs-scanner
 ```
+
+From version 0.2.1 on, the signed provenance is also attached to each release as a file
+(`SCS-Scanner-<version>-provenance.sigstore.json`, `SCS-Scanner-Setup-<version>-provenance.sigstore.json`), so the
+check does not need the GitHub API: `gh attestation verify scs.pyz --repo SedicCodeStudio/scs-scanner --bundle FILE`.
 
 ```powershell
 Get-FileHash .\scs.ps1 -Algorithm SHA256   # compare with SHA256SUMS
