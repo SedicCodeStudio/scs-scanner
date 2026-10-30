@@ -13,7 +13,8 @@ All notable changes to the SCS Scanner. Versions follow [Semantic Versioning](ht
   (for support). The build script finds Inno Setup 6 and 7.
 - Supply chain: CI, the release workflow and the Windows build install their tools (pytest, ruff, PyInstaller) only
   from hash-pinned lock files (`requirements/`, `packaging/windows/requirements.txt`), kept current by Dependabot.
-- The minimum Python version is now 3.9 – the oldest version the tests run on (Python 3.8 is end-of-life).
+- The minimum Python version is now 3.9 (Python 3.8 is end-of-life). The test suite needs Python 3.10+ (pytest 9,
+  which fixes CVE-2025-71176); CI checks Python 3.9 – the python3 of macOS – with a compile run, a quick scan and the self-test.
 - Releases also contain the signed build provenance as files (`*-provenance.sigstore.json`) for checks without the
   GitHub API.
 - Release workflow: draft first, Windows installer added and tested, every file checked against the source, then

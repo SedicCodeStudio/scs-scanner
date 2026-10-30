@@ -33,8 +33,18 @@ jobs:
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: ${{ matrix.python }}
-      - run: python -m pip install --require-hashes -r requirements/test.txt
-      - run: python -m pytest -q
+      - name: Test suite (pytest 9 needs Python 3.10+)
+        if: matrix.python != '3.9'
+        run: |
+          python -m pip install --require-hashes -r requirements/test.txt
+          python -m pytest -q
+      - name: Smoke test with Python 3.9 (compile everything, quick scan)
+        if: matrix.python == '3.9'
+        run: |
+          python -m compileall -q scs tools scs.py
+          python scs.py version
+          python scs.py scan --no-baseline --json smoke.json || [ $? -eq 1 ]   # 1 = detections, still a working scan
+          python -c "import json; json.load(open('smoke.json'))"
       - run: python scs.py selftest --no-baseline
 
   powershell:
