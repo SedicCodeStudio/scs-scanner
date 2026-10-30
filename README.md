@@ -163,5 +163,10 @@ python3 tools/build_release.py        # reproducible release files in dist/
 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) · [docs/RELEASING.md](docs/RELEASING.md) · [CHANGELOG.md](CHANGELOG.md)
 
 Licence: [Apache License 2.0](LICENSE); third-party data and code: [NOTICE](NOTICE).
+Copyright 2026 Florian Sedic (SedicCodeStudio).
+
+Name and logo: “SCS Scanner”, the “>_SCS” logo and “SedicCodeStudio” belong to Florian Sedic and are not covered
+by the licence. Modified copies must use their own name and logo. Official releases come only from this repository and
+[scs-scanner.de](https://scs-scanner.de).
 
 Contact: [info@sediccodestudio.de](mailto:info@sediccodestudio.de)
