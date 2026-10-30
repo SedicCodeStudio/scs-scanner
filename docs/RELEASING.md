@@ -62,7 +62,9 @@ Signed git tags make releases traceable to the maintainer: `git config gpg.forma
   protection, code scanning (CodeQL workflow), OpenSSF Scorecard.
 - Rules: `main` cannot be force-pushed or deleted; release tags `v*` cannot be moved or deleted.
 - Releases: immutable releases.
-- Actions: workflows get a read-only token by default and cannot approve pull requests; workflows from first-time
-  contributors need approval; only actions pinned to a full commit SHA are allowed.
+- Actions: workflows get a read-only token by default and cannot approve pull requests; workflows of all external
+  contributors need approval; only actions by GitHub and `ossf/scorecard-action`, each pinned to a full commit SHA,
+  may run (a new third-party action has to be added to the list in Settings › Actions first).
+- Pushes: at most 5 branches or tags can be changed in one push.
 - Maintainer account: two-factor authentication with a passkey or security key; review SSH keys, tokens, authorized
   apps and sessions twice a year.
