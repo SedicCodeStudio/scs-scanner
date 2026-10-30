@@ -7,14 +7,22 @@ on:
     - cron: "33 5 * * 2"
   workflow_dispatch:
 
-permissions: read-all
+permissions:
+  contents: read
+
+concurrency:
+  group: scorecard-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   analysis:
+    name: Scorecard analysis
     runs-on: ubuntu-latest
     permissions:
-      security-events: write
-      id-token: write
+      security-events: write   # upload the results to code scanning
+      id-token: write          # publish the results to the OpenSSF Scorecard API (signed)
+      contents: read           # read the repository
+      actions: read            # read the workflow runs (CI and dangerous-workflow checks)
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

@@ -1,5 +1,8 @@
 name: Release
 
+# Builds the release as a draft, adds the Windows installer, checks every file of the draft against the source and only
+# then publishes it. With immutable releases enabled, the tag and the files of a published release can never change.
+
 on:
   push:
     tags: ["v*"]
@@ -8,15 +11,20 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: release
+  cancel-in-progress: false   # never stop a release half-way
+
 jobs:
   release:
+    name: Build and draft the release
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.version.outputs.tag }}
     permissions:
-      contents: write        # create the GitHub release
-      id-token: write        # sign the build provenance
-      attestations: write
+      contents: write        # create the draft release
+      id-token: write        # sign the build provenance (Sigstore)
+      attestations: write    # store the build provenance attestation
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -26,9 +34,15 @@ jobs:
           python-version: "3.13"
       - name: Version and tag
         id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
           v=$(python -c "import re;print(re.search(r'VERSION = \"(.+?)\"', open('scs/core.py').read()).group(1))")
           if [ "$GITHUB_REF_TYPE" = "tag" ]; then test "v$v" = "$GITHUB_REF_NAME"; fi
+          draft=$(gh release view "v$v" --json isDraft --jq .isDraft 2>/dev/null || true)
+          if [ "$draft" = "false" ]; then echo "::error::v$v is already released - raise VERSION in scs/core.py"; exit 1; fi
+          if [ "$draft" = "true" ]; then gh release delete "v$v" --yes; fi   # leftover draft of an unfinished run
           echo "tag=v$v" >> "$GITHUB_OUTPUT"
       - run: python -m pip install --require-hashes -r requirements/test.txt && python -m pytest -q
       - name: Build (reproducible)
@@ -40,7 +54,7 @@ jobs:
             dist/scs.pyz
             dist/scs.ps1
             dist/SCS-Scanner-*.zip
-      - name: Publish the release
+      - name: Create the draft release
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
@@ -51,15 +65,16 @@ jobs:
           extra=()
           if [ -f "$BUNDLE" ]; then cp "$BUNDLE" "dist/SCS-Scanner-${TAG#v}-provenance.sigstore.json"; extra=(dist/*.sigstore.json); fi
           gh release create "$TAG" dist/scs.pyz dist/scs.ps1 dist/SCS-Scanner-*.zip dist/sbom.cdx.json dist/SHA256SUMS dist/ONE-LINERS.md "${extra[@]}" \
-            --title "SCS Scanner ${TAG#v}" --notes-file dist/ONE-LINERS.md --target "$GITHUB_SHA"
+            --draft --title "SCS Scanner ${TAG#v}" --notes-file dist/ONE-LINERS.md --target "$GITHUB_SHA"
 
   windows-installer:
+    name: Windows installer
     needs: release
     runs-on: windows-latest
     permissions:
-      contents: write
-      id-token: write
-      attestations: write
+      contents: write        # add the installer to the draft release
+      id-token: write        # sign the build provenance (Sigstore)
+      attestations: write    # store the build provenance attestation
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -91,7 +106,7 @@ jobs:
         id: attest
         with:
           subject-path: dist/SCS-Scanner-Setup-*.exe
-      - name: Add the installer, its provenance and its checksum to the release
+      - name: Add the installer, its provenance and its checksum to the draft
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
@@ -112,3 +127,32 @@ jobs:
           [IO.File]::AppendAllText((Resolve-Path dist/SHA256SUMS), "$hash  $($setup.Name)`n")
           gh release upload $env:TAG @files (Resolve-Path dist/SHA256SUMS).Path --clobber
           if ($LASTEXITCODE) { exit 1 }
+
+  publish:
+    name: Check the draft and publish it
+    needs: [release, windows-installer]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write        # publish the release
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.13"
+      - name: Check every file of the draft against the source
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.release.outputs.tag }}
+        run: |
+          gh release download "$TAG" --dir "$RUNNER_TEMP/draft"
+          ls -l "$RUNNER_TEMP/draft"
+          python tools/verify_release.py "$RUNNER_TEMP/draft" --repo "$GH_REPO"
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.release.outputs.tag }}
+        run: gh release edit "$TAG" --draft=false

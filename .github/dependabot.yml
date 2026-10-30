@@ -1,17 +1,14 @@
 version: 2
 updates:
+  # GitHub Actions, pinned to commit hashes. New versions are only proposed after a week, so a hijacked release is
+  # usually discovered before it reaches this project. Check every update: the new hash must belong to the tag.
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: monthly
+    cooldown:
+      default-days: 7
 
-  # hash-pinned tools: requirements/*.txt (tests, lint) and the Windows build (PyInstaller)
-  - package-ecosystem: pip
-    directories:
-      - /
-      - /packaging/windows
-    schedule:
-      interval: monthly
-    groups:
-      python-tools:
-        patterns: ["*"]
+# The Python tools (requirements/*.txt, packaging/windows/requirements.txt) are hash-pinned lock files for Python
+# 3.9 to 3.13 on all systems. Dependabot cannot regenerate such universal lock files, so they are updated by hand with
+# the command in their first lines; Dependabot alerts still report known vulnerabilities in them.

@@ -1,0 +1,7 @@
+# Changes to these files need the maintainer's review in pull requests: they decide what is built, released and run.
+*                                  @SedicCodeStudio
+/.github/                          @SedicCodeStudio
+/tools/                            @SedicCodeStudio
+/packaging/                        @SedicCodeStudio
+/requirements/                     @SedicCodeStudio
+/powershell/                       @SedicCodeStudio

@@ -16,6 +16,10 @@ All notable changes to the SCS Scanner. Versions follow [Semantic Versioning](ht
 - The minimum Python version is now 3.9 – the oldest version the tests run on (Python 3.8 is end-of-life).
 - Releases also contain the signed build provenance as files (`*-provenance.sigstore.json`) for checks without the
   GitHub API.
+- Release workflow: draft first, Windows installer added and tested, every file checked against the source, then
+  published – prepared for immutable releases (tag and files can never change after publishing).
+- Workflow hardening: zizmor audit in CI, dependency review for pull requests, concurrency limits, documented token
+  permissions, CODEOWNERS; Dependabot proposes action updates only after a one-week cooldown.
 
 ## 0.2.0 – 2026-10-29
 

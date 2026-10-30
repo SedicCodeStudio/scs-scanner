@@ -7,8 +7,17 @@
 3. Commit and push to `main`, then either push a tag (`git tag -a v0.2.1 -m "SCS Scanner 0.2.1" && git push origin v0.2.1`)
    or open *Actions › Release › Run workflow* – the workflow then creates the tag `v<VERSION>` itself.
 
-The workflow `.github/workflows/release.yml` then builds everything reproducibly, signs a build provenance attestation
-(Sigstore, no secret needed) and publishes the GitHub release with:
+The workflow `.github/workflows/release.yml` then
+
+1. runs the tests, builds everything reproducibly, signs a build provenance attestation (Sigstore, no secret needed)
+   and creates a **draft** release,
+2. builds the Windows installer, tests it (`packaging/windows/test-installer.ps1`: install, self-test, window,
+   uninstall) and adds it to the draft,
+3. downloads every file of the draft, checks it against the source with `tools/verify_release.py` and only then
+   **publishes** the release. Nothing half-finished or unchecked is ever visible.
+
+With *immutable releases* enabled (Settings › General › Releases), the tag and the files of a published release can
+never be changed or deleted afterwards – not even with stolen credentials. A mistake is fixed with a new version.
 
 | File | What |
 |---|---|
@@ -20,10 +29,15 @@ The workflow `.github/workflows/release.yml` then builds everything reproducibly
 | `SHA256SUMS`, `ONE-LINERS.md` | checksums and copy-and-paste commands for this version |
 | `*-provenance.sigstore.json` | signed build provenance of the program files and of the installer (Sigstore bundles) |
 
-4. Check the published release: download its files into one folder and run
-   `python3 tools/verify_release.py FOLDER` (on the tagged commit). It confirms that the downloads contain exactly the
-   source code and that `SHA256SUMS` and the SBOM match. The Windows installer is tested before it is published
-   (`packaging/windows/test-installer.ps1`: install, self-test, window, uninstall) – CI runs the same test on every push.
+Anyone can repeat the check later: download the files into one folder and run `python3 tools/verify_release.py FOLDER`
+on the tagged source (see SECURITY.md).
+
+## Tools used by CI and the release
+
+pytest, ruff, zizmor and PyInstaller are installed only from hash-pinned lock files (`requirements/*.txt`,
+`packaging/windows/requirements.txt`). To update one, change the version in the `.in` file next to it and run the
+command in the first lines of the `.txt` file (needs `uv`). GitHub Actions are pinned to commit hashes; Dependabot
+proposes updates a week after they appear – check that the new hash belongs to the release tag before merging.
 
 ## Code signing (recommended)
 
@@ -42,9 +56,13 @@ before the checksums are written.
 Signed git tags make releases traceable to the maintainer: `git config gpg.format ssh`,
 `git config user.signingkey ~/.ssh/id_ed25519.pub`, then `git tag -s`.
 
-## Repository settings (once, on GitHub)
+## Repository settings (set on GitHub)
 
-- Settings › Code security: enable **private vulnerability reporting**, **Dependabot alerts**, **secret scanning** and
-  **push protection**.
-- Settings › Branches: protect `main` (pull requests required, status checks "CI" required, no force pushes).
-- Settings › Actions: allow only actions that are pinned to a full commit SHA (all workflows here are).
+- Security: private vulnerability reporting, Dependabot alerts and security updates, secret scanning with push
+  protection, code scanning (CodeQL workflow), OpenSSF Scorecard.
+- Rules: `main` cannot be force-pushed or deleted; release tags `v*` cannot be moved or deleted.
+- Releases: immutable releases.
+- Actions: workflows get a read-only token by default and cannot approve pull requests; workflows from first-time
+  contributors need approval; only actions pinned to a full commit SHA are allowed.
+- Maintainer account: two-factor authentication with a passkey or security key; review SSH keys, tokens, authorized
+  apps and sessions twice a year.
